@@ -34,11 +34,9 @@ function RM.start(playerNum)
         read = {},              -- [itemID] = true, para no releer lo mismo
         booksRead = 0,
         snacksEaten = 0,
-        drinksTaken = 0,
         eatFails = 0,
-        drinkFails = 0,
         interrupted = false,    -- lo corto el jugador -> termina la maraton
-        selfInterrupt = false,  -- lo corto el mod para comer o beber
+        selfInterrupt = false,  -- lo corto el mod para comer
         currentAction = nil,    -- la lectura en curso, para poder cortarla
     }
     RM.sessions[playerNum] = session
@@ -97,8 +95,8 @@ local function queueRead(playerNum, session, playerObj, item, forFun)
         if s then
             s.currentAction = nil
             if s.selfInterrupt then
-                -- Lo cortamos nosotros para comer o beber: el libro vuelve a la
-                -- lista y se retoma solo (ISReadABook arranca en startPage).
+                -- Lo cortamos nosotros para comer: el libro vuelve a la lista
+                -- y se retoma solo (ISReadABook arranca en startPage).
                 s.selfInterrupt = false
                 s.read[item:getID()] = nil
             else
@@ -111,13 +109,19 @@ local function queueRead(playerNum, session, playerObj, item, forFun)
     ISTimedActionQueue.add(action)
 end
 
--- Comer y beber comparten forma: nunca se marcan como currentAction, asi no se
--- interrumpen a si mismos.
-local function queueConsume(playerNum, session, playerObj, action, onDone, textKey)
+-- Comer nunca se marca como currentAction, asi no se interrumpe a si mismo.
+local function queueEat(playerNum, session, playerObj, snack)
+    session.eatFails = session.eatFails + 1
+    ISInventoryPaneContextMenu.transferIfNeeded(playerObj, snack)
+
+    local action = ISEatFoodAction:new(playerObj, snack, 1)
     local originalPerform = action.perform
     action.perform = function(self)
         local s = RM.sessions[playerNum]
-        if s then onDone(s) end
+        if s then
+            s.eatFails = 0
+            s.snacksEaten = s.snacksEaten + 1
+        end
         originalPerform(self)
     end
 
@@ -129,32 +133,7 @@ local function queueConsume(playerNum, session, playerObj, action, onDone, textK
     end
 
     ISTimedActionQueue.add(action)
-    halo(playerObj, textKey, true)
-end
-
-local function queueEat(playerNum, session, playerObj, snack)
-    session.eatFails = session.eatFails + 1
-    ISInventoryPaneContextMenu.transferIfNeeded(playerObj, snack)
-    queueConsume(playerNum, session, playerObj,
-        ISEatFoodAction:new(playerObj, snack, 1),
-        function(s)
-            s.eatFails = 0
-            s.snacksEaten = s.snacksEaten + 1
-        end,
-        "IGUI_ReadingMarathon_Snack")
-end
-
-local function queueDrink(playerNum, session, playerObj, water)
-    session.drinkFails = session.drinkFails + 1
-    ISInventoryPaneContextMenu.transferIfNeeded(playerObj, water)
-    local percent = RM.getDrinkPercent(playerObj, water)
-    queueConsume(playerNum, session, playerObj,
-        ISDrinkFromBottle:new(playerObj, water, percent),
-        function(s)
-            s.drinkFails = 0
-            s.drinksTaken = s.drinksTaken + 1
-        end,
-        "IGUI_ReadingMarathon_Drink")
+    halo(playerObj, "IGUI_ReadingMarathon_Snack", true)
 end
 
 -- ---------- Maquina de estados ----------
@@ -182,12 +161,11 @@ function RM.step(playerNum)
         return RM.stop(playerNum, "IGUI_ReadingMarathon_Interrupted", false)
     end
 
-    -- Ocupado: si esta leyendo y le agarro hambre o sed, se corta la lectura
-    -- ahora mismo en vez de esperar a que termine el libro.
+    -- Ocupado: si esta leyendo y le agarro hambre, se corta la lectura ahora
+    -- mismo en vez de esperar a que termine el libro.
     if ISTimedActionQueue.isPlayerDoingAction(playerObj) then
         if RM.interruptToSatisfyNeeds and session.currentAction and not session.selfInterrupt then
-            local need = RM.getPendingNeed(playerObj, session)
-            if need then
+            if RM.getPendingSnack(playerObj, session) then
                 session.selfInterrupt = true
                 local ok = pcall(function() session.currentAction:forceStop() end)
                 if not ok then session.selfInterrupt = false end
@@ -196,13 +174,10 @@ function RM.step(playerNum)
         return
     end
 
-    -- Hambre y sed antes de seguir leyendo.
-    local need, needItem = RM.getPendingNeed(playerObj, session)
-    if need == "drink" then
-        queueDrink(playerNum, session, playerObj, needItem)
-        return
-    elseif need == "eat" then
-        queueEat(playerNum, session, playerObj, needItem)
+    -- Hambre antes de seguir leyendo. El agua la maneja el juego (Auto Drink).
+    local snack = RM.getPendingSnack(playerObj, session)
+    if snack then
+        queueEat(playerNum, session, playerObj, snack)
         return
     end
 
