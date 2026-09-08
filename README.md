@@ -6,10 +6,16 @@ al lado de "Leer" en el menú contextual de cualquier libro/revista.
 ## Qué hace
 
 - El personaje tiene que estar **sentado en un sillón o sofá** (chico o grande).
-- Lee **uno tras otro todos los libros del inventario** que le sirvan, en este
-  orden: libros de skill → libros de recetas → lectura de ocio.
+- Lee **solo lo que deja algo permanente**: libros de skill (multiplicador de
+  XP) primero y libros de recetas después. Los comics, revistas y novelas que
+  solo quitan aburrimiento **no** entran en la maratón.
+- **Excepción**: si durante la maratón el personaje se aburre mucho
+  (`BOREDOM >= 0.60`, ~"Very Bored") y tiene algo de ocio a mano, se toma un
+  respiro y lee eso; después vuelve a los libros importantes. Elige el que más
+  aburrimiento saca.
 - Salta lo que no aporta nada: libros ya terminados, demasiado difíciles para el
   nivel actual, ya superados, recetas ya aprendidas y lecturas hechas hace poco.
+- La maratón termina cuando no quedan libros importantes, aunque sobre ocio.
 - Mientras dura la maratón, **come snacks solo cuando le da hambre**
   (chocolates, papas fritas, galletitas, caramelos, etc.). El agua ya la toma
   solo el juego. Elige siempre el snack más contundente que tenga a mano.
@@ -40,6 +46,8 @@ En `42/media/lua/client/ReadingMarathon/ReadingMarathon_Core.lua`:
 | `RM.requireComfySeat` | `true` | Exigir sillón en vez de cualquier asiento. |
 | `RM.checkEveryTicks` | `10` | Cada cuántos ticks revisa el estado. |
 | `RM.maxEatFails` | `3` | Intentos fallidos de comer antes de rendirse. |
+| `RM.includeRecipeBooks` | `true` | Contar libros de recetas como importantes. |
+| `RM.boredomThreshold` | `0.60` | Aburrimiento (0..1) para permitir leer ocio. |
 
 Otros mods pueden sumar snacks propios:
 

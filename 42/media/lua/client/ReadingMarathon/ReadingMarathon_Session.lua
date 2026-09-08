@@ -39,7 +39,7 @@ function RM.start(playerNum)
     }
     RM.sessions[playerNum] = session
 
-    local books = RM.collectBooks(playerObj, session)
+    local books = RM.collectImportantBooks(playerObj, session)
     if #books == 0 then
         RM.sessions[playerNum] = nil
         halo(playerObj, "IGUI_ReadingMarathon_NoBooks", false)
@@ -66,8 +66,11 @@ end
 
 -- ---------- Acciones ----------
 
-local function queueRead(playerNum, session, playerObj, item)
+local function queueRead(playerNum, session, playerObj, item, forFun)
     session.read[item:getID()] = true
+    if forFun then
+        halo(playerObj, "IGUI_ReadingMarathon_Boredom", true)
+    end
 
     ISInventoryPaneContextMenu.transferIfNeeded(playerObj, item)
 
@@ -155,7 +158,17 @@ function RM.step(playerNum)
         end
     end
 
-    local books = RM.collectBooks(playerObj, session)
+    -- Muy aburrido: si tiene algo de ocio a mano, se toma un respiro.
+    if RM.isBored(playerObj) then
+        local funBooks = RM.collectBoredomBooks(playerObj, session)
+        if #funBooks > 0 then
+            queueRead(playerNum, session, playerObj, funBooks[1], true)
+            return
+        end
+    end
+
+    -- El resto de la maraton es solo lo que suma XP o recetas.
+    local books = RM.collectImportantBooks(playerObj, session)
     if #books == 0 then
         return RM.stop(playerNum, "IGUI_ReadingMarathon_Finished", true)
     end

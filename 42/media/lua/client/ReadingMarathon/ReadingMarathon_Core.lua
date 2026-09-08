@@ -18,6 +18,11 @@ RM.requireComfySeat = true
 RM.checkEveryTicks = 10
 -- Cuantos intentos fallidos de comer antes de dejar de intentarlo.
 RM.maxEatFails = 3
+-- Los libros de recetas cuentan como "importantes" ademas de los de skill.
+RM.includeRecipeBooks = true
+-- Aburrimiento (0..1) a partir del cual se permite leer algo de ocio.
+-- 0.60 ~ moodle "Very Bored".
+RM.boredomThreshold = 0.60
 
 -- Sesiones activas por numero de jugador: [playerNum] = { ... }
 RM.sessions = {}
@@ -153,28 +158,72 @@ function RM.forEachInventoryItem(playerObj, fn)
     scan(playerObj:getInventory(), 0)
 end
 
--- Lista de libros pendientes, ordenada: skill > recetas > ocio.
-function RM.collectBooks(playerObj, session)
+-- Un libro "importante" es el que deja algo permanente: multiplicador de XP
+-- de una skill, o recetas nuevas. Comics, revistas y novelas son solo ocio.
+function RM.isSkillBook(item)
+    local skillBook = SkillBook[item:getSkillTrained()]
+    return skillBook ~= nil and skillBook.perk ~= nil
+end
+
+function RM.isRecipeBook(item)
+    local recipes = item:getLearnedRecipes()
+    return recipes ~= nil and not recipes:isEmpty()
+end
+
+function RM.isImportantBook(item)
+    if RM.isSkillBook(item) then return true end
+    if RM.includeRecipeBooks and RM.isRecipeBook(item) then return true end
+    return false
+end
+
+-- Literatura de ocio que baja el aburrimiento (comics, revistas, novelas).
+function RM.isBoredomBook(item)
+    if RM.isImportantBook(item) then return false end
+    local ok, change = pcall(function() return item:getBoredomChange() end)
+    return ok and change ~= nil and change < 0
+end
+
+function RM.getBoredom(playerObj)
+    local ok, value = pcall(function()
+        return playerObj:getStats():get(CharacterStat.BOREDOM)
+    end)
+    if ok and value then return value end
+    return 0
+end
+
+function RM.isBored(playerObj)
+    return RM.getBoredom(playerObj) >= RM.boredomThreshold
+end
+
+-- Lista de libros pendientes que pasan el filtro dado.
+function RM.collectBooks(playerObj, session, filter)
     local books = {}
     RM.forEachInventoryItem(playerObj, function(item)
         if session and session.read[item:getID()] then return end
-        if RM.isReadableNow(playerObj, item) then
-            table.insert(books, item)
-        end
+        if not RM.isReadableNow(playerObj, item) then return end
+        if filter and not filter(item) then return end
+        table.insert(books, item)
     end)
+    return books
+end
 
-    local function priority(item)
-        if SkillBook[item:getSkillTrained()] then return 1 end
-        local recipes = item:getLearnedRecipes()
-        if recipes and not recipes:isEmpty() then return 2 end
-        return 3
-    end
-
+-- Lo que vale la pena: skill primero (multiplicadores de XP), recetas despues.
+function RM.collectImportantBooks(playerObj, session)
+    local books = RM.collectBooks(playerObj, session, RM.isImportantBook)
     table.sort(books, function(a, b)
-        local pa, pb = priority(a), priority(b)
+        local pa = RM.isSkillBook(a) and 1 or 2
+        local pb = RM.isSkillBook(b) and 1 or 2
         if pa ~= pb then return pa < pb end
         return a:getName() < b:getName()
     end)
+    return books
+end
 
+-- Ocio, ordenado por cuanto aburrimiento saca.
+function RM.collectBoredomBooks(playerObj, session)
+    local books = RM.collectBooks(playerObj, session, RM.isBoredomBook)
+    table.sort(books, function(a, b)
+        return a:getBoredomChange() < b:getBoredomChange()
+    end)
     return books
 end

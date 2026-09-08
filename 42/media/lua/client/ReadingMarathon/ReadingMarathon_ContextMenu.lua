@@ -37,7 +37,7 @@ function RM.addContextOption(context, items, playerNum)
             and "ContextMenu_ReadingMarathon_NeedCouch"
             or "ContextMenu_ReadingMarathon_NeedSit")
     else
-        local books = RM.collectBooks(playerObj)
+        local books = RM.collectImportantBooks(playerObj)
         if #books == 0 then
             option.notAvailable = true
             tooltip.description = getText("ContextMenu_ReadingMarathon_NoBooks")

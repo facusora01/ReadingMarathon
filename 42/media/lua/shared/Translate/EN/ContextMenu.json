@@ -1,8 +1,8 @@
 {
     "ContextMenu_ReadingMarathon": "Read Marathon",
     "ContextMenu_ReadingMarathon_Stop": "Stop Read Marathon",
-    "ContextMenu_ReadingMarathon_Tooltip": "Read every book in your inventory, one after another (%1 pending). Snacks are eaten automatically when you get hungry.",
+    "ContextMenu_ReadingMarathon_Tooltip": "Read every useful book in your inventory, one after another (%1 pending): skill and recipe books. Eats snacks, and reads something light if boredom gets bad.",
     "ContextMenu_ReadingMarathon_NeedSit": "You need to be sitting on a couch or armchair.",
     "ContextMenu_ReadingMarathon_NeedCouch": "That seat is not comfortable enough. Sit on a couch or armchair.",
-    "ContextMenu_ReadingMarathon_NoBooks": "Nothing left to read in your inventory."
+    "ContextMenu_ReadingMarathon_NoBooks": "No useful books left to read (skill or recipes)."
 }
