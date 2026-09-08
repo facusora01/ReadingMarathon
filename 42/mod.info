@@ -1,0 +1,8 @@
+name=Reading Marathon
+id=ReadingMarathon
+description=Sentado en un sillon, lee de corrido todos los libros del inventario y come snacks automaticamente cuando le da hambre. Compatible con B42.
+poster=poster.png
+icon=icon.png
+category=features
+modversion=1.0
+pzversion=42

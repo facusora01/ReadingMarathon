@@ -1,0 +1,12 @@
+{
+    "IGUI_ReadingMarathon_Started": "Read marathon: %1 books",
+    "IGUI_ReadingMarathon_Finished": "Marathon over: %1 books read",
+    "IGUI_ReadingMarathon_Stopped": "Marathon stopped (%1 books read)",
+    "IGUI_ReadingMarathon_Interrupted": "Read marathon interrupted",
+    "IGUI_ReadingMarathon_StoodUp": "Marathon over: you got up",
+    "IGUI_ReadingMarathon_TooDark": "Too dark to keep reading",
+    "IGUI_ReadingMarathon_Snack": "Snack time",
+    "IGUI_ReadingMarathon_NoBooks": "Nothing to read",
+    "IGUI_ReadingMarathon_NeedSit": "You need to be sitting on a couch",
+    "IGUI_ReadingMarathon_NeedCouch": "You need a couch or an armchair"
+}

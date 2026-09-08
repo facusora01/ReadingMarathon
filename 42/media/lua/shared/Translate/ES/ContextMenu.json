@@ -1,0 +1,8 @@
+{
+    "ContextMenu_ReadingMarathon": "Maratón de lectura",
+    "ContextMenu_ReadingMarathon_Stop": "Detener maratón de lectura",
+    "ContextMenu_ReadingMarathon_Tooltip": "Lee uno tras otro todos los libros del inventario (%1 pendientes). Come snacks solo cuando le da hambre.",
+    "ContextMenu_ReadingMarathon_NeedSit": "Tenés que estar sentado en un sillón.",
+    "ContextMenu_ReadingMarathon_NeedCouch": "Ese asiento no es lo bastante cómodo. Sentate en un sillón o sofá.",
+    "ContextMenu_ReadingMarathon_NoBooks": "No queda nada por leer en el inventario."
+}
