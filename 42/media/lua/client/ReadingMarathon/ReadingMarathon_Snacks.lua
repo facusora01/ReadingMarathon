@@ -92,11 +92,17 @@ end
 function RM.isDrinkableWater(item)
     if not item then return false end
 
-    local ok, isWater = pcall(function() return item:isWaterSource() end)
-    if not ok or not isWater then return false end
-
     local container = item:getFluidContainer()
     if not container then return false end
+
+    -- FluidContainer:isFilledWithCleanWater() ya cubre agua + no vacio + no
+    -- contaminada, que es exactamente lo que hace falta.
+    local ok, clean = pcall(function() return container:isFilledWithCleanWater() end)
+    if ok and clean ~= nil then return clean == true end
+
+    -- Respaldo por si esa API no esta.
+    local okWater, isWater = pcall(function() return item:isWaterSource() end)
+    if not okWater or not isWater then return false end
 
     local okEmpty, empty = pcall(function() return container:isEmpty() end)
     if not okEmpty or empty then return false end
