@@ -137,7 +137,16 @@ function RM.getThirst(playerObj)
     return 0
 end
 
+function RM.vanillaAutoDrinkEnabled()
+    local ok, value = pcall(function() return getCore():getOptionAutoDrink() end)
+    return ok and value == true
+end
+
 function RM.shouldDrink(playerObj)
+    if RM.thirstMode == "never" then return false end
+    -- Con Auto Drink prendido el motor ya bebe solo, y encima sin interrumpir
+    -- la lectura: duplicarlo seria tomar de mas y cortar el libro al pedo.
+    if RM.thirstMode == "vanilla" and RM.vanillaAutoDrinkEnabled() then return false end
     return RM.getThirst(playerObj) >= RM.thirstThreshold
 end
 

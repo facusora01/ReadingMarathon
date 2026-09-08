@@ -18,6 +18,12 @@ RM.requireComfySeat = true
 RM.checkEveryTicks = 10
 -- Sed (0..1) a partir de la cual el personaje toma agua.
 RM.thirstThreshold = 0.30
+-- Quien se ocupa de la sed. El juego ya trae "Auto Drink" (Opciones, o el
+-- submenu de una botella), que bebe solo desde el motor sin cortar la accion.
+--   "vanilla" -> si Auto Drink esta prendido, se deja al juego; si no, lo hace el mod
+--   "always"  -> lo hace el mod siempre, aunque Auto Drink este prendido
+--   "never"   -> el mod no toca la sed
+RM.thirstMode = "vanilla"
 -- Cuantos intentos fallidos de comer o beber antes de dejar de intentarlo.
 RM.maxNeedFails = 3
 -- Cortar la lectura en el momento en que aparece el hambre o la sed, en vez
