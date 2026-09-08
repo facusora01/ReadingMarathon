@@ -1,6 +1,6 @@
 name=Reading Marathon
 id=ReadingMarathon
-description=Sentado en un sillon, lee de corrido todos los libros del inventario y come snacks automaticamente cuando le da hambre. Compatible con B42.
+description=Sit on a couch and read every worthwhile book in your inventory back to back: skill books first, then recipe books. Your character eats snacks on their own when hunger kicks in, and takes a break with some light reading when boredom gets bad. Build 42.
 poster=poster.png
 icon=icon.png
 category=features

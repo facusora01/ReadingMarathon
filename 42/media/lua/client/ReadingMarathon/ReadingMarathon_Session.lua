@@ -180,8 +180,16 @@ end
 
 local tickCounter = 0
 
+-- Kahlua (el Lua de PZ) no expone next(), asi que se recorre con pairs.
+local function hasSessions()
+    for _ in pairs(RM.sessions) do
+        return true
+    end
+    return false
+end
+
 local function onTick()
-    if next(RM.sessions) == nil then return end
+    if not hasSessions() then return end
     tickCounter = tickCounter + 1
     if tickCounter < RM.checkEveryTicks then return end
     tickCounter = 0
