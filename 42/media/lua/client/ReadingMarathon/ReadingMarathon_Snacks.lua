@@ -118,7 +118,9 @@ function RM.findWater(playerObj)
     local best, bestAmount = nil, nil
     RM.forEachInventoryItem(playerObj, function(item)
         if not RM.isDrinkableWater(item) then return end
-        local ok, amount = pcall(function() return item:getFluidContainer():getFluidAmount() end)
+        -- getAmount(), no getFluidAmount(): eso ultimo es de Resource, no de
+        -- FluidContainer, y devolvia nil silenciosamente dentro del pcall.
+        local ok, amount = pcall(function() return item:getFluidContainer():getAmount() end)
         if not ok or not amount then return end
         if not best or amount < bestAmount then
             best, bestAmount = item, amount
@@ -142,7 +144,7 @@ end
 -- Cuanto tomar: lo justo para la sed, como hace el menu del juego.
 function RM.getDrinkPercent(playerObj, waterItem)
     local ok, percent = pcall(function()
-        local available = waterItem:getFluidContainer():getFluidAmount()
+        local available = waterItem:getFluidContainer():getAmount()
         if available <= 0 then return 1 end
         local units = math.min(RM.getThirst(playerObj) * 2, available)
         return units / available
