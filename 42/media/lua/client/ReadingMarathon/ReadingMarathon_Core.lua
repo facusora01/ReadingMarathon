@@ -16,8 +16,13 @@ RM.hungerThreshold = 0.22
 RM.requireComfySeat = true
 -- Cada cuantos ticks se revisa el estado de la maraton.
 RM.checkEveryTicks = 10
--- Cuantos intentos fallidos de comer antes de dejar de intentarlo.
-RM.maxEatFails = 3
+-- Sed (0..1) a partir de la cual el personaje toma agua.
+RM.thirstThreshold = 0.30
+-- Cuantos intentos fallidos de comer o beber antes de dejar de intentarlo.
+RM.maxNeedFails = 3
+-- Cortar la lectura en el momento en que aparece el hambre o la sed, en vez
+-- de esperar a terminar el libro (un libro puede durar horas in-game).
+RM.interruptToSatisfyNeeds = true
 -- Los libros de recetas cuentan como "importantes" ademas de los de skill.
 RM.includeRecipeBooks = true
 -- Aburrimiento (0..1) a partir del cual se permite leer algo de ocio.

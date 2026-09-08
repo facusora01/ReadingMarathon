@@ -85,9 +85,85 @@ function RM.getHunger(playerObj)
     return 0
 end
 
+-- ---------- Agua ----------
+
+-- Un envase del que se pueda beber ya mismo: agua no contaminada y con algo
+-- adentro. ISDrinkFromBottle necesita si o si un fluid container.
+function RM.isDrinkableWater(item)
+    if not item then return false end
+
+    local ok, isWater = pcall(function() return item:isWaterSource() end)
+    if not ok or not isWater then return false end
+
+    local container = item:getFluidContainer()
+    if not container then return false end
+
+    local okEmpty, empty = pcall(function() return container:isEmpty() end)
+    if not okEmpty or empty then return false end
+
+    local okTainted, tainted = pcall(function() return container:isTainted() end)
+    if okTainted and tainted then return false end
+
+    return true
+end
+
+-- Elige el envase con menos agua, para ir vaciando los que estan por la mitad.
+function RM.findWater(playerObj)
+    local best, bestAmount = nil, nil
+    RM.forEachInventoryItem(playerObj, function(item)
+        if not RM.isDrinkableWater(item) then return end
+        local ok, amount = pcall(function() return item:getFluidContainer():getFluidAmount() end)
+        if not ok or not amount then return end
+        if not best or amount < bestAmount then
+            best, bestAmount = item, amount
+        end
+    end)
+    return best
+end
+
+function RM.getThirst(playerObj)
+    local ok, value = pcall(function()
+        return playerObj:getStats():get(CharacterStat.THIRST)
+    end)
+    if ok and value then return value end
+    return 0
+end
+
+function RM.shouldDrink(playerObj)
+    return RM.getThirst(playerObj) >= RM.thirstThreshold
+end
+
+-- Cuanto tomar: lo justo para la sed, como hace el menu del juego.
+function RM.getDrinkPercent(playerObj, waterItem)
+    local ok, percent = pcall(function()
+        local available = waterItem:getFluidContainer():getFluidAmount()
+        if available <= 0 then return 1 end
+        local units = math.min(RM.getThirst(playerObj) * 2, available)
+        return units / available
+    end)
+    if ok and percent and percent > 0 then return percent end
+    return 1
+end
+
+-- ---------- Decision ----------
+
 function RM.shouldEat(playerObj)
     if RM.getHunger(playerObj) < RM.hungerThreshold then return false end
     -- No comer si ya esta lleno (el juego bloquea la accion igual).
     if playerObj:getMoodles():getMoodleLevel(MoodleType.FOOD_EATEN) >= 3 then return false end
     return true
+end
+
+-- Que necesita el personaje ahora mismo: "drink" | "eat" | nil.
+-- La sed va primero porque aprieta mas rapido que el hambre.
+function RM.getPendingNeed(playerObj, session)
+    if session.drinkFails < RM.maxNeedFails and RM.shouldDrink(playerObj) then
+        local water = RM.findWater(playerObj)
+        if water then return "drink", water end
+    end
+    if session.eatFails < RM.maxNeedFails and RM.shouldEat(playerObj) then
+        local snack = RM.findSnack(playerObj)
+        if snack then return "eat", snack end
+    end
+    return nil, nil
 end

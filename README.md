@@ -16,9 +16,14 @@ al lado de "Leer" en el menú contextual de cualquier libro/revista.
 - Salta lo que no aporta nada: libros ya terminados, demasiado difíciles para el
   nivel actual, ya superados, recetas ya aprendidas y lecturas hechas hace poco.
 - La maratón termina cuando no quedan libros importantes, aunque sobre ocio.
-- Mientras dura la maratón, **come snacks solo cuando le da hambre**
-  (chocolates, papas fritas, galletitas, caramelos, etc.). El agua ya la toma
-  solo el juego. Elige siempre el snack más contundente que tenga a mano.
+- Mientras dura la maratón, **corta la lectura apenas aparece el hambre o la
+  sed**, come o bebe, y retoma el mismo libro donde lo dejó. La sed va primero
+  porque aprieta más rápido.
+  - **Comida**: solo snacks (chocolates, papas fritas, galletitas, caramelos).
+    Elige el más contundente que tenga a mano.
+  - **Agua**: cualquier envase con agua no contaminada; elige el que menos
+    tenga, para ir vaciando los que están por la mitad, y toma solo lo que
+    necesita para la sed.
 - La maratón se corta si el personaje se levanta, se queda sin luz para leer, se
   duerme o si el jugador interrumpe la acción. También se puede detener a mano
   con la opción "Detener maratón de lectura".
@@ -45,7 +50,9 @@ En `42/media/lua/client/ReadingMarathon/ReadingMarathon_Core.lua`:
 | `RM.hungerThreshold` | `0.22` | Hambre (0..1) a partir de la cual come. |
 | `RM.requireComfySeat` | `true` | Exigir sillón en vez de cualquier asiento. |
 | `RM.checkEveryTicks` | `10` | Cada cuántos ticks revisa el estado. |
-| `RM.maxEatFails` | `3` | Intentos fallidos de comer antes de rendirse. |
+| `RM.thirstThreshold` | `0.30` | Sed (0..1) a partir de la cual toma agua. |
+| `RM.maxNeedFails` | `3` | Intentos fallidos de comer/beber antes de rendirse. |
+| `RM.interruptToSatisfyNeeds` | `true` | Cortar el libro en curso para comer o beber. |
 | `RM.includeRecipeBooks` | `true` | Contar libros de recetas como importantes. |
 | `RM.boredomThreshold` | `0.60` | Aburrimiento (0..1) para permitir leer ocio. |
 

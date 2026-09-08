@@ -9,5 +9,6 @@
     "IGUI_ReadingMarathon_NoBooks": "Nothing to read",
     "IGUI_ReadingMarathon_NeedSit": "You need to be sitting on a couch",
     "IGUI_ReadingMarathon_NeedCouch": "You need a couch or an armchair",
-    "IGUI_ReadingMarathon_Boredom": "A break from the boredom"
+    "IGUI_ReadingMarathon_Boredom": "A break from the boredom",
+    "IGUI_ReadingMarathon_Drink": "Time for a drink"
 }
