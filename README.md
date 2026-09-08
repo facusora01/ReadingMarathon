@@ -94,5 +94,10 @@ poster=poster.png
 icon=icon.png
 ```
 
-Para regenerarlas si cambia el original: recorte cuadrado centrado a 256x256
-para el icono, y la imagen completa escalada a 512 de ancho para el poster.
+El panel de mods dibuja el poster **siempre a 200x200** (`drawTextureScaled` en
+`ModInfoPanelDesc.lua`), así que la imagen tiene que ser cuadrada o se ve
+aplastada. Ambas salen del mismo recorte: un cuadrado de 560px del original
+centrado en el dibujo (x=513, y=283, medido por bounding box del contenido, no
+del lienzo), que corta los márgenes vacíos de los costados.
+
+`preview.png` (256x256) del proyecto de Workshop sale del mismo recorte.
